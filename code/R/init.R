@@ -1,55 +1,23 @@
-library(readxl)
-library(readr)
-require(graphics)
-library(ggplot2)
-library(ggfortify)
-library(svglite)
-library(patchwork)
-library(forecast)
-library(pracma)
-#library(mlmts)
-library(foreach)
-library(doParallel)
-library(collections)
-library(stringr)
-library(tsne)
-library(hexbin)
-library(Rtsne)
-library(RColorBrewer)
-library(mltools)
-library(factoextra)
-library(sets)
-library(dtw)
-library(dtwclust)
-library(zoo)
-library(imputeTS)
-library(tidyr)
+source("./code/R/libload.R")
+source("./code/R/util_functions.R")
 
 
 totalCores = detectCores()
 cluster <- makeCluster(totalCores[1]-1)
 registerDoParallel(cluster)                                        # read data
-metabolites <- read_excel("data/raw/metabolites_summary_2019_.xlsx",
-    sheet = "Tabelle1")
-climadata <- read_excel("data/raw/climadata_collector_2019_jun-nov.xlsx",
-    sheet = "Klimadaten kollektor_2019_jun-n")
+metabolites <- read_excel("data/raw/metabolites_summary_2019_.xlsx",sheet = "Tabelle1")
+climadata <- read_excel("data/raw/climadata_collector_2019_jun-nov.xlsx",sheet = "Klimadaten kollektor_2019_jun-n")
 # select dates
 dates_of_interest <- unique(na.omit(metabolites$Date))
 nsplit <- length(dates_of_interest) -1
 lidxx <- foreach (iter = 1:nsplit, .combine=rbind) %dopar% {climadata$Zeit >dates_of_interest[iter]& climadata$Zeit<=dates_of_interest[iter+1]}
 stopCluster(cluster)
-
-
-
 ltempxx <- queue()
 ltranspxx <- queue() # transpiration
 lphotoxx <- queue()  # photosynthesis
 lhumxx <- queue()    # humidity
 lco2xx <- queue()    # co2
 lradxx <- queue()    # radiation
-
-
-
 metabolites <- metabolites[-c(1),]
 metabolites_ <- metabolites[metabolites$Substrat == "rock wool",]
 metabolites_ <- head(metabolites_,-3)
@@ -61,8 +29,6 @@ beta_caotin <- as.numeric(metabolites_$"ß-Caotin...10")
 lycopen <- as.numeric(metabolites_$Lycopen)
 bind_full <- rbind(lutein,beta_caotin,lycopen)
 bind_fulln <- normalize_input(bind_full)
-
-
 coumaric <- as.numeric(metabolites_$"coumaric acid hexosid...31")
 ferulic <- as.numeric(metabolites_$"ferulic acid hexoside...32")
 caffeic <- as.numeric(metabolites_$"caffeic acid derivates sum...33")
@@ -171,7 +137,7 @@ legend("topleft",
        col = factor(levels(factor(group))))
 dev.off()
 
-
+lmtsxx <- queue()
 
 for (iter in 1:nsplit){
   idx <- lidxx[iter, ]
@@ -208,16 +174,13 @@ llmtsxx_smooth <- llmtsxx_smooth$as_list()
 
 
 df_boot <- map(llmtsxx_smooth,tsbootstrapover_onemts,nb=500)
-saveRDS(df_boot, "dataset_smooth.Rds", compress = FALSE)
+#saveRDS(df_boot, "dataset_smooth.Rds", compress = FALSE)
 
 
 saveRDS(llmtsxx_smooth,"./data/processed/llmtsxx_smooth.rds")
 saveRDS(llmtsxx,"./data/processed/llmtsxx.rds")
 
 
-library(stats)
-library(proxy)
-library(deldir)
 
 
 bind_phen <- rbind(coumaric,ferulic,caffeic,coumaryl)

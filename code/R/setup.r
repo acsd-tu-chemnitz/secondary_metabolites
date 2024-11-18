@@ -1,4 +1,7 @@
+
+
 Ncpus <- getOption("Ncpus")
+
 options(Ncpus=parallel::detectCores() - 1)
 install.packages("readxl")
 install.packages("readr")
@@ -21,7 +24,7 @@ install.packages("RColorBrewer")
 install.packages("mltools")
 install.packages("factoextra")
 install.packages("sets")
-install.packages("dtw")
+install.packages("dtw") 
 install.packages("dtwclust")
 install.packages("zoo")
 install.packages("proxy")

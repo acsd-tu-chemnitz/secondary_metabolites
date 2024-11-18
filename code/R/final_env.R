@@ -1,3 +1,4 @@
+
 source("./code/R/libload.R")
 source("./code/R/util_functions.R")
 
@@ -145,7 +146,7 @@ print(summary(c(bootstat0,bootstat1)))
 }
 
 
-## multiplot
+## radiation x transpiration
 pl <- NULL
 df <- data.frame(radiation = cap_radiation_cl0, transpiration = cap_transpiration_cl0)
 df2 <- data.frame(radiation = cap_radiation_cl1, transpiration = cap_transpiration_cl1)
@@ -175,4 +176,3 @@ paste(mean(acc$acc)*100,"±",format(std_err(acc$acc)*100, digits = 4),"[%]")
 paste(mean(acc$auc)*100,"±",format(std_err(acc$auc)*100, digits = 4),"[%]")
 
 
-library(pROC)
