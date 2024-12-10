@@ -2,31 +2,7 @@
 source("./code/R/libload.R")
 source("./code/R/util_functions.R")
 
-# start with meandf
-
-
-modus <- 0 # 0 is mean, 1 is std_err
-
-feat1aslist <- queue()
-
-
-meandf <- queue()
-
-for (idx in 1:length(df_boot)){
-  feataslist <- queue()
-  for (channel in 1:6){
-    feataspart <- colMeans(df_boot[[idx]][[channel]])
-    feataslist$push(feataspart)
-  }
-  meandf$push(feataslist$as_list())
-}
-
-
-if (modus==0){
-  featdf <- readRDS("./data/processed/final_meandf.rds")
-}else{
-  featdf <- readRDS("./data/processed/final_stderrdf.rds")
-}
+featdf <- readRDS("./data/processed/final_meandf.rds")
 
 
 B <- length(featdf[[1]][[1]])
@@ -55,7 +31,7 @@ lEE <- list(
 #)
 
  lEE <- list(
-        "total_phenolic" = c(0, 0, 1, 0, 1, 1, 1, 0)
+         "beta"= c(0, 1, 1, 1, 1, 0, 0, 0)
  )
 
 
@@ -72,17 +48,8 @@ channel_units <- c("photosynthesis"="mean photosynthesis [μmol CO2/qm s]",  "tr
 
 
 
-if(modus == 0){ # mean
-    channels_lims <- channels_lims_mean
-    featoI <- "mean"
-}else if(modus == 1){ # std_err
-    channels_lims <- channels_lims_std
-    featoI <- "std"
-}else{
-    print("error in featoI")
-}
-
-
+channels_lims <- channels_lims_mean
+featoI <- "mean"
 
 
 for (i in names(lEE)){
@@ -154,16 +121,9 @@ pl <- ggplot() + geom_point( data = df, color = "#f1b0ac", aes(x = radiation, y 
 pl <-
 pl + labs(x = "Radiation [PPFD]", y = "Transpiration [mg H2O/m2s]") + geom_point() + stat_ellipse(geom = "polygon",data = df2,aes(x = radiation, y = transpiration ), alpha = 0.1, inherit.aes = FALSE ,level = 0.90)
 pl
-ggsave("multiplot_mean.png",pl)
-
-
-
-
-
+ggsave("1__multiplot_mean.tiff",pl)
 
 library(scales)
-
-
 
 X <- featdf
 y<- lEE$beta

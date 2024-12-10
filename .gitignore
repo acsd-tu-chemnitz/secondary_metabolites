@@ -52,3 +52,4 @@ rsconnect/
 *.png
 *.svg
 *.Rds 
+*.tiff

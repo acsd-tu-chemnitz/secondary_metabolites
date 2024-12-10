@@ -174,7 +174,12 @@ llmtsxx_smooth <- llmtsxx_smooth$as_list()
 
 
 df_boot <- map(llmtsxx_smooth,tsbootstrapover_onemts,nb=500)
-#saveRDS(df_boot, "dataset_smooth.Rds", compress = FALSE)
+saveRDS(df_boot, "dataset_smooth.Rds", compress = FALSE)
+
+df_boot <- map(llmtsxx_smooth,tsbootstrapover_onemts,nb=500)
+saveRDS(df_boot, "dataset.Rds", compress = FALSE)
+
+
 
 
 saveRDS(llmtsxx_smooth,"./data/processed/llmtsxx_smooth.rds")
