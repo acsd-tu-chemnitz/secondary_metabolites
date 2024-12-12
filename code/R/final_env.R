@@ -127,12 +127,8 @@ library(scales)
 
 X <- featdf
 y<- lEE$beta
-#y <- as.numeric(!y)
 
-
-acc <- binary_cross_fols_validation_with_acc(X,y,8,4)
-
-paste(mean(acc$acc)*100,"±",format(std_err(acc$acc)*100, digits = 4),"[%]")
-paste(mean(acc$auc)*100,"±",format(std_err(acc$auc)*100, digits = 4),"[%]")
-
+acc <- binary_cross_fols_validation_with_acc(X,y,8,5)
+print(paste(mean(acc$acc)*100,"±",format(std_err(acc$acc)*100, digits = 4),"[%]"))
+#print(paste(mean(acc$auc)*100,"±",format(std_err(acc$auc)*100, digits = 4),"[%]"))
 

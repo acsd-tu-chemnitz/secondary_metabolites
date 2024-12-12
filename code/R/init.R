@@ -173,268 +173,28 @@ for (iter in llmtsxx){
 llmtsxx_smooth <- llmtsxx_smooth$as_list()
 
 
-df_boot <- map(llmtsxx_smooth,tsbootstrapover_onemts,nb=500)
-saveRDS(df_boot, "dataset_smooth.Rds", compress = FALSE)
 
-df_boot <- map(llmtsxx_smooth,tsbootstrapover_onemts,nb=500)
-saveRDS(df_boot, "dataset.Rds", compress = FALSE)
+plan(multisession, workers = 8)
+df_boot <- map(llmtsxx,tsbootstrapover_onemts,nb=500)
+saveRDS(df_boot, "dataset.Rds",compress = FALSE)
 
 
+feat1aslist <- queue()
 
+meandf <- queue()
 
-saveRDS(llmtsxx_smooth,"./data/processed/llmtsxx_smooth.rds")
-saveRDS(llmtsxx,"./data/processed/llmtsxx.rds")
+for (idx in 1:length(df_boot)){
+  feataslist <- queue()
+  for (channel in 1:6){
+    feataspart <- colMeans(df_boot[[idx]][[channel]])
+    feataslist$push(feataspart)
+  }
+  meandf$push(feataslist$as_list())
+}
 
+saveRDS(meandf$as_list(), "./data/processed/final_meandf.rds", compress = FALSE)
 
 
 
-bind_phen <- rbind(coumaric,ferulic,caffeic,coumaryl)
-bind_phenn <- normalize_input(bind_phen)
-
-set.seed(52)
-
-
-proj_bind <- Rtsne(t(bind_p2n), perplexity = 4,check_duplicates = FALSE)
-
-svglite("tsne_results_acids_group2_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-      legend = levels(factor(group)),
-        pch = 19,
-        col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind_phen$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-# exp4
-
-bind_p4 <- rbind(coumaric,ferulic,caffeic,coumaryl,naringenin, quercetin)
-
-bind_p4n <- normalize_input(bind_p4)
-
-set.seed(52)
-
-
-
-
-proj_bind <- Rtsne(t(bind_p4n), perplexity = 4,check_duplicates = FALSE)
-
-svglite("tsne_results_acids_group3_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav_group3.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-bind_p5 <- rbind(coumaric,ferulic,caffeic,coumaryl, quercetin)
-
-bind_p5n <- normalize_input(bind_p5)
-
-set.seed(52)
-
-
-
-
-proj_bind <- Rtsne(t(bind_p5n), perplexity = 4,check_duplicates = FALSE)
-
-svglite("tsne_results_acids_group5_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav_group5.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-bind_p6 <- rbind(coumaric,ferulic,coumaryl, quercetin)
-
-bind_p6n <- normalize_input(bind_p6)
-
-set.seed(52)
-
-
-
-
-proj_bind <- Rtsne(t(bind_p6n), perplexity = 4,check_duplicates = FALSE)
-
-svglite("tsne_results_acids_group6_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav_group6.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-bind_p7 <- rbind(coumaric,ferulic,quercetin)
-
-bind_p7n <- normalize_input(bind_p7)
-
-set.seed(52)
-
-
-
-
-proj_bind <- Rtsne(t(bind_p7n), perplexity = 4,check_duplicates = FALSE)
-
-svglite("tsne_results_acids_group7_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav_group7.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-bind_p8 <- rbind(coumaric,quercetin)
-
-bind_p8n <- normalize_input(bind_p8)
-
-
-plot(bind_p8n[1,], bind_p8n[2,], pch=19, col=factor(group))
-
-
-set.seed(2)
-
-
-
-
-proj_bind <- Rtsne(t(bind_p8n), perplexity = 4,check_duplicates = FALSE)
-
-#svglite("tsne_results_acids_group8_.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-
-km2 <- kmeans(proj_bind$Y,2,25)
-
-group <- metabolites$Date
-proj_bind_full <- cbind(proj_bind$Y,metabolites$Date)
-v_mosaic <- deldir(km2$centers[, 1], km2$centers[, 2])
-tiles <- tile.list(v_mosaic)
-
-
-svglite("tsne_results_phenolic_flav_group8.svg", width = 10, height = 10)
-plot(proj_bind$Y[, 1], proj_bind$Y[, 2], pch=19, col=factor(group))
-points(proj_bind$Y[1, 1], proj_bind$Y[1, 2], col="blue")
-points(km2$centers, pch=3, cex=1.5, lwd=2)
-text(km2$centers,labels=rownames(km2$centers),pos=2)
-plot(tiles,add = TRUE)
-legend("topleft",
-       legend = levels(factor(group)),
-       pch = 19,
-       col = factor(levels(factor(group))))
-dev.off()
-
-bind_p9 <- rbind(quercetin)
-
-plot(quercetin)
-lines(quercetin)
+saveRDS(llmtsxx_smooth,"./data/processed/llmtsxx_smooth.rds",compress = FALSE)
+saveRDS(llmtsxx,"./data/processed/llmtsxx.rds",compress = FALSE)
